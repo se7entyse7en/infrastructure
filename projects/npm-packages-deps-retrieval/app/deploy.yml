@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      volumes:
+        - name: volmap
+          configMap:
+            name: app-conf
+      containers:
+      - name: app
+        image: se7entyse7en/npm-pdr-app:latest
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: volmap
+            readOnly: true
+            mountPath: "/usr/share/nginx/html/config.js"
+            subPath: "config.js"

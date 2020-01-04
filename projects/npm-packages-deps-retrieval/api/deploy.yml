@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      volumes:
+        - name: volmap
+          configMap:
+            name: api-conf
+      containers:
+      - name: envoy
+        image: se7entyse7en/npm-pdr-envoy:latest
+        ports:
+          - containerPort: 9090
+        volumeMounts:
+          - name: volmap
+            readOnly: true
+            mountPath: "/etc/envoy/envoy.yaml"
+            subPath: "envoy.yaml"
+      - name: api
+        image: se7entyse7en/npm-pdr-cmd:latest
+        args: ['api', '-p', '8080', '-u', 'mongodb://mongodb-svc:27017', '-d', 'packages', '-c', 'dependencies']
