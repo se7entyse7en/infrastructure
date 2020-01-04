@@ -1,0 +1,15 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dispatcher-cron
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: dispatcher
+            image: se7entyse7en/npm-pdr-cmd:latest
+            args: ['dispatcher', '-b', 'amqp://rabbitmq-svc:5672', '-q', 'events', '-t', '100']
+          restartPolicy: OnFailure
